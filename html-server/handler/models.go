@@ -100,9 +100,9 @@ func (c *Code) Get(id string) *Code {
 }
 
 func (c *Code) Create() *Code {
-	_, err := dao.db.Exec("INSERT INTO code (id, code) value(?,?)", c.ID, c.Code)
+	_, err := dao.db.Exec("INSERT INTO code (id, code, language) value(?,?, ?)", c.ID, c.Code, c.Language)
 	if err != nil {
-		fmt.Println(c.Code, c.ID)
+		fmt.Println(c.Language, c.ID)
 		log.Fatal("create error:", err)
 	}
 	return c

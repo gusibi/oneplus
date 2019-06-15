@@ -105,3 +105,7 @@ venv.bak/
 
 # temp
 temp/
+
+.qiniu_pythonsdk_hostscache.json
+
+html-server/html-server.zip

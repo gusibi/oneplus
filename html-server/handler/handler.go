@@ -21,14 +21,33 @@ const TEMPLATE = `<html>
    <link rel="stylesheet" href="http://media.gusibi.mobi/highlight/static/styles/atom-one-dark.css">
    <script src="http://media.gusibi.mobi/highlight/static/highlight.site.pack.js"></script>
    <script>hljs.initHighlightingOnLoad();</script>
+   <style type="text/css">
+        body {
+            /* background-image: url(https://www.google.com);
+            margin: 0; */
+            font-size: 16px;
+        }
+        
+        .hljs {
+            padding: 8px;
+        }
+        
+        .hljs span {
+            padding: 0px;
+            line-height: 20px;
+        }
+        
+        pre,
+        code {
+            margin: 0;
+            padding-top: 0;
+        }
+    </style>
 </head>
-<body style="width: 560px;">
+<body style="width: 640px;">
 <pre>
-<code class="{{.Language}}">
-{{.Code}}
-</code>
+<code class="{{.Language}}">{{.Code}}</code>
 </pre>
-<img src="https://www.google.com" alt="">
 </body>
 </html>`
 
