@@ -14,9 +14,9 @@ func main() {
 	handler.InitDB()
 	router := httprouter.New()
 	router.GET("/", handler.EchoHandler)
-	router.POST("/create", handler.CreateHtml)
-	router.GET("/render/:id", handler.RenderCode)
-	router.GET("/sleep/:seconds", handler.Sleep)
+	router.POST("/code/render", handler.CodeRender)
+	router.POST("/codes", handler.CreateHtml)
+	router.GET("/codes/:id", handler.RenderCode)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

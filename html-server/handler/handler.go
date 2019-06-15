@@ -142,6 +142,19 @@ func CreateHtml(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 		w.Write(js)
 	}
 }
+func CodeRender(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Panic(err)
+	}
+	var code CodeBody
+	err = json.Unmarshal(body, &code)
+	if err != nil {
+		log.Panic(err)
+	}
+	t, _ := template.New("hello").Parse(TEMPLATE)
+	t.Execute(w, &code)
+}
 
 func RenderCode(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	id := ps.ByName("id")

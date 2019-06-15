@@ -21,8 +21,9 @@ func init() {
 	handler.InitDB()
 	router := httprouter.New()
 	router.GET("/", handler.EchoHandler)
-	router.POST("/create", handler.CreateHtml)
-	router.GET("/render/:id", handler.RenderCode)
+	router.POST("/code/render", handler.CodeRender)
+	router.POST("/codes", handler.CreateHtml)
+	router.GET("/codes/:id", handler.RenderCode)
 
 	httpAdapter = httpadapter.New(router)
 	log.Println("adapter: ", httpAdapter)

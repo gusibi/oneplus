@@ -36,8 +36,8 @@ from qiniu import Auth, put_file, Zone, set_default
 
 from webshot import webshot
 
-Code2HtmlCreateUrl = "http://service-g5235zgh-1254035985.ap-beijing.apigateway.myqcloud.com/test/create"
-Code2HtmlUrlPrefix = "http://service-g5235zgh-1254035985.ap-beijing.apigateway.myqcloud.com/test/render/"
+Code2HtmlCreateUrl = "http://service-g5235zgh-1254035985.ap-beijing.apigateway.myqcloud.com/test/codes"
+Code2HtmlUrlPrefix = "http://service-g5235zgh-1254035985.ap-beijing.apigateway.myqcloud.com/test/codes/"
 
 logger = logging.getLogger("oneplus: ")
 # formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
