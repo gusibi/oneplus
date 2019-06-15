@@ -49,7 +49,7 @@ QINIU_SECRET_TOKEN = environ.get("QINIU_SECRET_TOKEN")
 QINIU_DOMAIN = "media.gusibi.mobi"
 
 def MD5(code):
-    return md5_constructor(code).hexdigest().lower()
+    return md5_constructor(code.encode("utf-8")).hexdigest().lower()
 
 def upload27niu(filepath):
     if not filepath:
