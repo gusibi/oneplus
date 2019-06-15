@@ -124,7 +124,7 @@ class OnePlush:
         codeblock = match.group(2)
         image_path = code2img(codeblock, language)
         image_url, _ = upload27niu(image_path)
-        return "\n![](%s)\n" % image_url
+        return "\n\n![](%s)\n\n" % image_url
         # return self._code_block_sub(match, is_fenced_code_block=True)
 
     def _do_fenced_code_blocks(self, text):
