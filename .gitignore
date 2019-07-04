@@ -103,6 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# golang
+main
+
 # temp
 temp/
 
@@ -115,3 +118,4 @@ temp/
 # scf
 html-server/html-server.zip
 mobile-attribution/mobile.zip
+

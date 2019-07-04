@@ -2,6 +2,7 @@ package handler
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -75,12 +76,19 @@ func GetMobileAttribution(mobile string) (*Mobile, error) {
 		ZipCode:  phone.ZipCode,
 		AreaCode: phone.AreaCode,
 	}
-	fmt.Println(result)
 	return result, nil
 }
 
 func GetMobileAttributionHandler(req scf.APIGatewayProxyRequest) (scf.APIGatewayProxyResponse, error) {
-	body := fmt.Sprintf("Hello world")
+	mobile := req.QueryString["mobile"]
+	result, _ := GetMobileAttribution(mobile)
+	var body string
+	bodyByte, err := json.Marshal(result)
+	if err != nil {
+		body = fmt.Sprintf("server error")
+	} else {
+		body = string(bodyByte)
+	}
 	response := scf.APIGatewayProxyResponse{StatusCode: 200, Headers: headers, Body: body, IsBase64Encoded: false}
 	return response, nil
 }
