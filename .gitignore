@@ -106,6 +106,12 @@ venv.bak/
 # temp
 temp/
 
+# vscode
+.vscode/
+
+# qiniu
 .qiniu_pythonsdk_hostscache.json
 
+# scf
 html-server/html-server.zip
+

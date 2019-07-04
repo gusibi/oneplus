@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// Config db config struct
 type Config struct {
 	DSN         string
 	Active      int
@@ -17,10 +18,12 @@ type Config struct {
 	IdleTimeout time.Duration
 }
 
+// NewConfig create new db config
 func NewConfig(dsn string, active, idle int, idleTimeout time.Duration) *Config {
 	return &Config{DSN: dsn, Active: active, Idle: idle, IdleTimeout: idleTimeout}
 }
 
+// NewMysql create new mysql client
 func NewMysql(c *Config) (db *sql.DB) {
 	db, err := Open(c)
 	if err != nil {
@@ -29,6 +32,7 @@ func NewMysql(c *Config) (db *sql.DB) {
 	return
 }
 
+// Open connect db
 func Open(c *Config) (db *sql.DB, err error) {
 	db, err = sql.Open("mysql", c.DSN)
 	if err != nil {
@@ -41,11 +45,13 @@ func Open(c *Config) (db *sql.DB, err error) {
 	return db, nil
 }
 
+// Dao DAO(Data Access Object)一个数据访问接口
 type Dao struct {
 	c  *Config
 	db *sql.DB
 }
 
+// NewDao create new dao
 func NewDao(c *Config) (d *Dao) {
 	d = &Dao{
 		c:  c,
@@ -54,10 +60,12 @@ func NewDao(c *Config) (d *Dao) {
 	return d
 }
 
+// Ping ping db
 func (d *Dao) Ping() (err error) {
 	return d.db.Ping()
 }
 
+// Close close db
 func (d *Dao) Close() {
 	d.db.Close()
 }
@@ -77,6 +85,7 @@ func getDSN() string {
 
 var dao *Dao
 
+// InitDB 初始化数据库
 func InitDB() {
 	dsn := getDSN()
 	config := NewConfig(dsn, 20, 10, time.Minute)
@@ -84,12 +93,14 @@ func InitDB() {
 	log.Println("init db succeed..")
 }
 
+// Code code struct
 type Code struct {
 	ID       string `db:"id"`
 	Code     string `db:"code"`
 	Language string `db:"language"`
 }
 
+// Get get code by id
 func (c *Code) Get(id string) *Code {
 	err := dao.db.QueryRow("SELECT code, language FROM code WHERE id=?", id).Scan(&c.Code, &c.Language)
 	if err != nil {
@@ -99,6 +110,7 @@ func (c *Code) Get(id string) *Code {
 	return c
 }
 
+// Create add new code content
 func (c *Code) Create() *Code {
 	_, err := dao.db.Exec("INSERT INTO code (id, code, language) value(?,?, ?)", c.ID, c.Code, c.Language)
 	if err != nil {
