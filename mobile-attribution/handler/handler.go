@@ -68,6 +68,9 @@ func GetMobileAttribution(mobile string) (*Mobile, error) {
 	}
 	phoneModel := Phone{}
 	phone := phoneModel.Get(number)
+	if phone == nil {
+		return nil, errors.New("mobile not found")
+	}
 	result := &Mobile{
 		Mobile:   mobile,
 		Operator: OperatorType[phone.Type],

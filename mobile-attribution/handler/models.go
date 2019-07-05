@@ -146,7 +146,7 @@ type Phones struct {
 func (p *Phones) Create() *Phones {
 	_, err := mdao.db.Exec("INSERT INTO phones (number, type, region_id) value(?,?,?)", p.Number, p.Type, p.RegionID)
 	if err != nil {
-		fmt.Println(p.RegionID, p.Number)
+		// fmt.Println(p.RegionID, p.Number)
 		log.Fatal("create error:", err)
 	}
 	return p
@@ -167,7 +167,7 @@ func (p *Phone) Get(number int) *Phone {
 	sql := `SELECT number, type, province, city, zip_code, area_code FROM phones 
 			LEFT JOIN regions ON phones.region_id=regions.id
 			WHERE number=?`
-	fmt.Println(sdao.db)
+	// fmt.Println(sdao.db)
 	err := sdao.db.QueryRow(sql, number).Scan(&p.Mobile, &p.Type, &p.Province, &p.City, &p.ZipCode, &p.AreaCode)
 	if err != nil {
 		log.Println("query error: ", err)
