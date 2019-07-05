@@ -160,11 +160,7 @@ func Response(statusCode int, body string) scf.APIGatewayProxyResponse {
 func GetMobileAttributionHandler(req scf.APIGatewayProxyRequest) (scf.APIGatewayProxyResponse, error) {
 	var body string
 	statusCode := 200
-	fmt.Println(req)
-	fmt.Println(req.QueryStringParameters)
-	fmt.Println(req.QueryString)
 	mobile := req.QueryString["mobile"]
-	fmt.Println("mobile: ", mobile)
 	result, err := GetMobileAttribution(mobile)
 	if err != nil {
 		if err.Error() == "invalid mobile" {
@@ -177,8 +173,6 @@ func GetMobileAttributionHandler(req scf.APIGatewayProxyRequest) (scf.APIGateway
 		body = err.Error()
 		return Response(statusCode, Error(body)), nil
 	}
-	fmt.Println("result: ", result)
-	fmt.Println("body: ", body)
 	bodyByte, err := json.Marshal(result)
 	if err != nil {
 		body = "server error"
@@ -186,6 +180,5 @@ func GetMobileAttributionHandler(req scf.APIGatewayProxyRequest) (scf.APIGateway
 	} else {
 		body = string(bodyByte)
 	}
-	fmt.Println("body: ", body)
 	return Response(statusCode, body), nil
 }
