@@ -6,8 +6,10 @@ import (
 )
 
 func TestGetMobileAttribution(t *testing.T) {
-	t.Log(GetMobileAttribution("18511111234"))
-	t.Log(GetMobileAttribution("+8618511111234"))
+	// t.Log(GetMobileAttribution("18543741111"))
+	// t.Log(GetMobileAttribution("+8618511111234"))
+	t.Log(GetMobileAttribution("19543741111"))
+	t.Log(GetMobileAttribution("19800001111"))
 }
 
 func BenchmarkGetMobileAttribution(t *testing.B) {

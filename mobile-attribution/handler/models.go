@@ -11,6 +11,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var DB_SOURCE string
+
 // MySQLConfig db config struct
 type MySQLConfig struct {
 	DSN         string
@@ -113,7 +115,7 @@ func getMySQLDSN() string {
 }
 
 func getSqliteDSN() string {
-	dbfile := EnvGet("DBFILE", "./phone.db")
+	dbfile := EnvGet("MOBILE_DBFILE", "./phone.db")
 	return dbfile
 }
 
@@ -131,7 +133,10 @@ func InitDB() {
 }
 
 func init() {
-	InitDB()
+	DB_SOURCE = EnvGet("DB_SOURCE", "DB")
+	if DB_SOURCE == "DB" {
+		InitDB()
+	}
 }
 
 // Phones phones struct
@@ -152,6 +157,12 @@ func (p *Phones) Create() *Phones {
 	return p
 }
 
+// Fetch 遍历全部数据
+func (p *Phones) Fetch() (*sql.Rows, error) {
+	rows, err := sdao.db.Query("SELECT * FROM phones ORDER BY number")
+	return rows, err
+}
+
 // Phone 数据库连表查询结果
 type Phone struct {
 	Mobile   string `json:"mobile"`
@@ -170,8 +181,23 @@ func (p *Phone) Get(number int) *Phone {
 	// fmt.Println(sdao.db)
 	err := sdao.db.QueryRow(sql, number).Scan(&p.Mobile, &p.Type, &p.Province, &p.City, &p.ZipCode, &p.AreaCode)
 	if err != nil {
-		log.Println("query error: ", err)
+		// log.Println("query error: ", err)
 		return nil
 	}
 	return p
+}
+
+// Region Region struct
+type Region struct {
+	ID       int    `db:"id"`
+	Province string `json:"province"`
+	City     string `json:"city"`
+	ZipCode  string `json:"zip_code"`
+	AreaCode string `json:"area_code"`
+}
+
+// Fetch 遍历全部数据
+func (r *Region) Fetch() (*sql.Rows, error) {
+	rows, err := sdao.db.Query("SELECT * FROM regions ORDER BY id")
+	return rows, err
 }
