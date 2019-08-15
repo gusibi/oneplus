@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.DS_Store
 
 # C extensions
 *.so
@@ -119,3 +120,5 @@ temp/
 html-server/html-server.zip
 mobile-attribution/mobile.zip
 
+db-*/
+sorteDB/
