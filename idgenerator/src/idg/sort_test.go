@@ -1,14 +1,12 @@
 package idg
 
-func loadIndex2Redis() {
+import "testing"
 
-}
-
-func loadIndex2Mem() {
-
-}
-
-func InitIndex(useRedis bool) {
-	// 为了加快
-
+func TestLoad(t *testing.T) {
+	t.Run("progress", func(t *testing.T) {
+		progress := NewProgress("./progress")
+		data := map[string]int64{"file1": 0, "file2": 100, "file3": 200}
+		progress.Refresh(data)
+		progress.Load()
+	})
 }

@@ -120,5 +120,9 @@ temp/
 html-server/html-server.zip
 mobile-attribution/mobile.zip
 
+pkg/
 db-*/
+dbs/
 sorteDB/
+progress
+db-progress

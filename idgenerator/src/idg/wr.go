@@ -28,7 +28,7 @@ func Uint642Md5(md51, md52 uint64) string {
 func Mkdir(dir string) {
 	err := os.Mkdir(dir, os.ModePerm)
 	if err != nil {
-		log.Fatalf("mkdir %s error: [%v]\n", err)
+		log.Fatalf("mkdir %s error: [%v]\n", dir, err)
 	} else {
 		log.Printf("mkdir %s success", dir)
 	}

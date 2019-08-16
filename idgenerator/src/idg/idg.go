@@ -52,8 +52,9 @@ import (
 )
 
 // STARTYEAR 开始年份
-// const STARTYEAR = 1920
-const STARTYEAR = 2018
+const STARTYEAR = 1920
+
+// const STARTYEAR = 2008
 
 // ENDYEAR 结束年份
 const ENDYEAR = 2019
@@ -150,10 +151,10 @@ func IDGeneratorByMonths(areaCode, year, month int, idChan chan string) {
 
 // IDGeneratorByYear 按年生成身份证号
 func IDGeneratorByYear(areaCode, year int, idChan chan string, wg *sync.WaitGroup) {
-	fmt.Println("add 1")
 	wg.Add(1)
+
 	for month := 1; month <= 12; month++ {
-		fmt.Println(MONTHS, "month: ", month, month-1)
+		// fmt.Println(MONTHS, "month: ", month, month-1)
 		IDGeneratorByMonths(areaCode, year, month, idChan)
 	}
 	wg.Done()
