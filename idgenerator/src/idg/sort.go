@@ -33,7 +33,7 @@ type ID struct {
 	MD52   uint64
 }
 
-func partition(intervals []*ID, p, r int) int {
+func partitionByID(intervals []*ID, p, r int) int {
 	// 分区，把大于分区的放分区点右边，小于分区的放左边
 	pivot := intervals[r].MD5
 	i := p
@@ -47,13 +47,14 @@ func partition(intervals []*ID, p, r int) int {
 	return i
 }
 
-func quickSort(intervals []*ID, p, r int) []*ID {
+// QuickSort 快排
+func QuickSort(intervals []*ID, p, r int) []*ID {
 	if p >= r {
 		return intervals
 	}
-	q := partition(intervals, p, r) // 获取分区点
-	quickSort(intervals, p, q-1)
-	quickSort(intervals, q+1, r)
+	q := partitionByID(intervals, p, r) // 获取分区点
+	QuickSort(intervals, p, q-1)
+	QuickSort(intervals, q+1, r)
 	return intervals
 }
 
@@ -229,7 +230,7 @@ func splitFile(fileName, tmpPath string, limit int) {
 			defer wg.Done()
 			numbers := Bytes2Uint64(bytesData, n)
 			ids := getIds(numbers)
-			ids = quickSort(ids, 0, len(ids)-1)
+			ids = QuickSort(ids, 0, len(ids)-1)
 			if len(ids) > 0 {
 				start, end := ids[0].MD5, ids[len(ids)-1].MD5
 				// fmt.Println(start, end)
@@ -346,22 +347,23 @@ func mergeFile(sortedFile string, splitFiles []string) {
 		}
 		heap.Insert(sortedID)
 	}
-	log.Printf("File: %s merged。", sortedFile)
+	log.Printf("File: %s merged", sortedFile)
 }
 
-func getDirFiles(path string) []string {
+// GetDirFiles 获取目录下的文件路径
+func GetDirFiles(path string) (subFiles, fs []string) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	var subFiles []string
 	for _, f := range files {
 		fname := f.Name()
 		if strings.HasSuffix(fname, ".bin") {
+			fs = append(fs, fname)
 			subFiles = append(subFiles, fmt.Sprintf("%s/%s", path, fname))
 		}
 	}
-	return subFiles
+	return subFiles, fs
 }
 
 // SortSingleAreaIds 给单个地区ID排序
@@ -370,7 +372,7 @@ func SortSingleAreaIds(areaCode int, fileName string) {
 	// create dir
 	os.Mkdir(tmpPath, os.ModePerm)
 	splitFile(fileName, tmpPath, SplitLimit)
-	splitFiles := getDirFiles(tmpPath)
+	splitFiles, _ := GetDirFiles(tmpPath)
 	sorteDir := "sorteDB"
 	os.Mkdir(sorteDir, os.ModePerm)
 	sortedFile := fmt.Sprintf("%s/%d.bin", sorteDir, areaCode)
@@ -525,7 +527,7 @@ func writeSorteIds(dbPath string, sortedAreaFiles []string) {
 func SortAllIds(targetPath, sourcePath string) {
 	// filepath 为所有已排序数据存放目录
 	// 读取 sorteDB 的文件，使用归并排序
-	sourceFiles := getDirFiles(sourcePath)
+	sourceFiles, _ := GetDirFiles(sourcePath)
 	os.Mkdir(targetPath, os.ModePerm)
 	writeSorteIds(targetPath, sourceFiles)
 }
