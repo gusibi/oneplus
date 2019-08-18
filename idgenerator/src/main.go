@@ -1,9 +1,41 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
+	"net/http"
+	"github.com/gin-gonic/gin"
 	idg "md52id/idg"
 )
+
+func idNumber(c *gin.Context){
+	idBase := c.Query("base") // get id base
+	if idBase == ""{
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_id_base"})
+	}
+	idNumber := idg.IDNumberFill(idBase)
+	c.JSON(200, gin.H{
+		"id_number": idNumber,
+	})
+}
+
+func id2md5(c *gin.Context){
+	id := c.Query("id") // get id base
+	if !idg.ValidateIDNumber(id){
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_id"})
+	}
+	md5 := idg.Md5(id)
+	c.JSON(200, gin.H{
+		"md5": md5,
+	})
+}
+
+func search(c *gin.Context){
+	md5 := c.Query("md5") // get query param
+	idNumber:=idg.FindIDNumberFromMem(md5)
+	c.JSON(200, gin.H{
+		"id_number": idNumber,
+	})
+}
 
 func main() {
 	// id md5 数据初始化，结果为按区号分类已经排好序的文件
@@ -13,31 +45,9 @@ func main() {
 	// 索引初始化
 	idg.LoadIndex(false)
 	// start server
-	// id := idg.IDNumberFill("10000019220101003")
-	// md5 := idg.Md5(id)
-	// md51, md52 := idg.Md52Uint64(md5)
-	// fmt.Println(id, md5, md51, md52)
-	// id = idg.IDNumberFill("10000019230101001")
-	// md5 = idg.Md5(id)
-	// md51, md52 = idg.Md52Uint64(md5)
-	// fmt.Println(id, md5, md51, md52)
-	// id = idg.IDNumberFill("10000019800101003")
-	// md5 = idg.Md5(id)
-	// md51, md52 = idg.Md52Uint64(md5)
-	// fmt.Println(id, md5, md51, md52)
-	// for offset := 0; offset <= 1200; offset = offset + 24 {
-	// 	offset, n, bytesData := idg.ReadFromBinary("sorteDB/330227.bin", int64(offset), 24)
-	// 	numbers := idg.Bytes2Uint64(bytesData, n)
-	// 	// fmt.Println(offset, numbers)
-	// 	fmt.Println(idg.Uint642Md5(numbers[0], numbers[1]), offset)
-	// }
-	// fmt.Println("offset: ", offset, "data: ", data)
-	// idg.SortSingleAreaIds(652222, "db-652222/652222.bin")
-	// idg.LoadIndex(false)
-	idBase := "33022719891020695"
-	idNumber := idg.IDNumberFill(idBase)
-	fmt.Println("id: ", idNumber)
-	md5 := idg.Md5(idNumber)
-	fmt.Println("md5: ", md5)
-	idg.FindIDNumberFromMem(md5)
+	r := gin.Default()
+	r.GET("/search", search)
+	r.GET("/id2md5", id2md5)
+	r.GET("/idNumber", idNumber)
+	r.Run() // listen and serve on 0.0.0.0:8080
 }

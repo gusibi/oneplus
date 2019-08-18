@@ -2,6 +2,7 @@ package idg
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 )
@@ -51,7 +52,7 @@ func getIndexes(file, key string, wg *sync.WaitGroup) {
 }
 
 func loadIndex2Redis() {
-
+	log.Println("Load index from redis")
 }
 
 func loadIndex2Mem() {
@@ -65,9 +66,8 @@ func loadIndex2Mem() {
 		go getIndexes(dbPath, key, &wg)
 		fmt.Println(dbPath)
 	}
-	fmt.Println(dbPaths)
 	wg.Wait()
-	// fmt.Println(len(Indexes[dbFiles[0]]))
+	log.Println("Load index to memc")
 }
 
 // LoadIndex 加载索引
@@ -82,7 +82,7 @@ func LoadIndex(useRedis bool) {
 
 func partition(intervals []string, p, r int) int {
 	// 分区，把大于分区的放分区点右边，小于分区的放左边
-	fmt.Println(intervals)
+	// fmt.Println(intervals)
 	pivot := intervals[r]
 	i := p
 	for j := p; j <= r-1; j++ {
@@ -112,7 +112,7 @@ func BinarySearch(values []string, target string) int {
 	left, right := 0, len(values)-1
 	for left <= right {
 		mid := (right + left) / 2
-		fmt.Println("left: ", left, "right: ", right, "mid: ", mid)
+		// fmt.Println("left: ", left, "right: ", right, "mid: ", mid)
 		if values[mid] == target {
 			return mid
 		} else if values[mid] > target {
@@ -128,6 +128,29 @@ func BinarySearch(values []string, target string) int {
 	return -1
 }
 
+// BinarySearch 使用二分查找搜索数据
+func BinarySearchFromBytes(values []byte, target string) uint64 {
+	// 使用二分法查找values 中小于等于target 且差值最小的元素
+	length := len(values)/24
+	left, right := 0, length-1
+	for left <= right {
+		mid := (right + left) / 2
+		offset := mid * 24
+		// fmt.Println("left: ", left, "right: ", right, "mid: ", mid, "offset: ", offset)
+		value := values[offset:offset+24]
+		numbers := Bytes2Uint64(value, 24)
+		md5 := Uint642Md5(numbers[0], numbers[1])
+		if md5 == target {
+			return numbers[2]
+		} else if md5 > target {
+			right = mid - 1
+		} else if md5 < target {
+			left = mid + 1
+		}
+	}
+	return 0
+}
+
 func getKeys(indexes map[string][]string) []string {
 	keys := make([]string, 0, len(indexes))
 	for k := range indexes {
@@ -138,26 +161,32 @@ func getKeys(indexes map[string][]string) []string {
 
 func findFile(md5 string) string {
 	files := getKeys(Indexes)
-	fmt.Println("files:-----------", files)
+	// fmt.Println("files:-----------", files)
 	sortedFiles := quickSort(files, 0, len(files)-1)
 	keyIndex := BinarySearch(sortedFiles, md5)
-	fmt.Println("key index: ", keyIndex)
+	// fmt.Println("key index: ", keyIndex)
 	fileKey := sortedFiles[keyIndex]
-	fmt.Println(fileKey)
+	// fmt.Println(fileKey)
 	return fileKey
 }
 
 func getIDNumber(md5, fileKey string) uint64 {
 	fileName := fmt.Sprintf("%s/%s.bin", DBPath, fileKey)
-	fmt.Println("fileName", fileName)
+	// fmt.Println("fileName", fileName)
 	startIndex := BinarySearch(Indexes[fileKey], md5)
-	startMd5 := Indexes[fileKey][startIndex]
-	fmt.Println("start: ", startMd5)
-	nextMd5 := Indexes[fileKey][startIndex+1]
-	fmt.Println("next: ", nextMd5)
+	// startMd5 := Indexes[fileKey][startIndex]
+	// fmt.Println("start: ", startMd5)
+	// nextMd5 := Indexes[fileKey][startIndex+1]
+	// fmt.Println("next: ", nextMd5)
 	offset := PageLimit * 24 * startIndex
-	fmt.Println("offset: ", offset)
-	return 12345
+	// fmt.Println("offset: ", offset)
+	// 读取页数据
+	_, n, bytesData := ReadFromBinary(fileName, int64(offset), PageLimit*24)
+	if n == 0{
+		return 0
+	}
+    id:=BinarySearchFromBytes(bytesData, md5)	
+	return id
 }
 
 //FindIDNumberFromMem 从内存中查找数据
@@ -165,7 +194,7 @@ func FindIDNumberFromMem(md5 string) uint64 {
 	//先从一级索引找到可能存在的文件
 	// 再从文件查找对应的身份证号，如果找到返回对应的身份证号码，找不到返回空
 	fileKey := findFile(md5)
-	fmt.Println("fileKey: ", fileKey)
+	// fmt.Println("fileKey: ", fileKey)
 	id := getIDNumber(md5, fileKey)
 	return id
 }

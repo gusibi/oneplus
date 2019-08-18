@@ -107,6 +107,17 @@ func LeapYear(year int) bool {
 	}
 }
 
+func ValidateIDNumber(id string) bool{
+	if len(id) != 18{
+		return false
+	}
+	idBase := id[:17]
+	if id != IDNumberFill(idBase){
+		return false
+	}
+	return true
+}
+
 // IDNumberFill 添加校验位
 func IDNumberFill(id string) string {
 	sum := 0
