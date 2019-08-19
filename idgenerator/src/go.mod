@@ -8,4 +8,4 @@ replace (
 	golang.org/x/text v0.3.0 => github.com/golang/text v0.3.0
 )
 
-require github.com/gin-gonic/gin v1.4.0 // indirect
+require github.com/gin-gonic/gin v1.4.0
