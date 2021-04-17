@@ -126,3 +126,5 @@ dbs/
 sorteDB/
 progress
 db-progress
+
+.idea/
