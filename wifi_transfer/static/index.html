@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Drop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --text-color: #f0f0f0;
+            --accent-color: #64ffda;
+            --danger-color: #ff6b6b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Glassmorphism Container */
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .drop-zone p {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .files-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .file-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        .btn-download {
+            background: var(--accent-color);
+            color: #1a1a2e;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .btn-download:hover {
+            transform: scale(1.05);
+        }
+
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-img {
+            max-width: 200px;
+            border-radius: 10px;
+            border: 4px solid white;
+            margin-bottom: 10px;
+        }
+
+        .url-text {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            user-select: all;
+        }
+
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 768px) {
+            .qr-section {
+                display: none;
+                /* Hide QR on mobile since checking on mobile */
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>WiFi Drop</h1>
+            <p class="subtitle">Fast & Secure Local File Transfer</p>
+        </header>
+
+        <div class="grid">
+            <!-- Upload Section -->
+            <div class="card">
+                <div class="card-title">📤 Send Files</div>
+                <div class="drop-zone" id="dropZone">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>Drag & Drop or Click to Upload</p>
+                    <input type="file" id="fileInput" multiple style="display: none;">
+                </div>
+                <div id="uploadStatus"
+                    style="margin-top: 10px; text-align: center; font-size: 0.9rem; min-height: 20px;"></div>
+            </div>
+
+            <!-- QR Code Section (Visible on Desktop) -->
+            <div class="card qr-section">
+                <div class="card-title">📱 Connect Mobile</div>
+                <div class="qr-container">
+                    <img src="/api/qr" alt="QR Code" class="qr-img">
+                    <div class="url-text" id="urlDisplay">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Files List Section -->
+        <div class="card" style="flex-grow: 1;">
+            <div class="card-title">📂 Shared Files</div>
+            <ul class="files-list" id="filesList">
+                <!-- Files will be populated here -->
+                <li class="file-item" style="justify-content: center; opacity: 0.5;">No files shared yet</li>
+            </ul>
+            <button onclick="loadFiles()"
+                style="margin-top: 10px; background: rgba(255,255,255,0.1); border:none; color:white; padding: 8px; border-radius: 6px; cursor: pointer;">Refresh
+                List</button>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const filesList = document.getElementById('filesList');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const urlDisplay = document.getElementById('urlDisplay');
+
+        // Load server info
+        fetch('/api/info')
+            .then(res => res.json())
+            .then(data => {
+                urlDisplay.textContent = data.url;
+            });
+
+        // Helper: Format bytes
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        }
+
+        // Load files
+        function loadFiles() {
+            fetch('/api/files')
+                .then(res => res.json())
+                .then(data => {
+                    filesList.innerHTML = '';
+                    if (data.files.length === 0) {
+                        filesList.innerHTML = '<li class="file-item" style="justify-content: center; opacity: 0.5;">No files shared yet</li>';
+                        return;
+                    }
+                    data.files.forEach(file => {
+                        const li = document.createElement('li');
+                        li.className = 'file-item';
+                        li.innerHTML = `
+                        <div class="file-info">
+                            <span class="file-name" title="${file.name}">${file.name}</span>
+                            <span class="file-size">${formatBytes(file.size)}</span>
+                        </div>
+                        <a href="/api/download/${encodeURIComponent(file.name)}" class="btn-download" download>Download</a>
+                    `;
+                        filesList.appendChild(li);
+                    });
+                });
+        }
+
+        // Upload files
+        function uploadFiles(files) {
+            if (files.length === 0) return;
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            dropZone.classList.add('loading');
+            uploadStatus.textContent = 'Uploading...';
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    dropZone.classList.remove('loading');
+                    uploadStatus.textContent = `Uploaded ${data.uploaded.length} files!`;
+                    setTimeout(() => uploadStatus.textContent = '', 3000);
+                    loadFiles();
+                })
+                .catch(err => {
+                    console.error(err);
+                    dropZone.classList.remove('loading');
+                    uploadStatus.textContent = 'Upload failed.';
+                });
+        }
+
+        // Event Listeners
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => uploadFiles(fileInput.files));
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropZone.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            dropZone.classList.remove('dragover');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            uploadFiles(files);
+        }
+
+        // Initial load
+        loadFiles();
+        // Auto-refresh every 5 seconds
+        setInterval(loadFiles, 5000);
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+python-multipart
+qrcode[pil]
+jinja2
